@@ -6,11 +6,16 @@ import (
 	"github.com/h2non/bimg"
 )
 
-func ResizeImage(buf *bytes.Buffer) ([]byte, error) {
-	// TODO: check that the image format is appropriate for the application
-	resized, err := bimg.NewImage(buf.Bytes()).Process(bimg.Options{
-		Width:  500,
-		Height: 500,
+func ResizeImage(buf *bytes.Buffer, width int, height int) ([]byte, error) {
+	imageToResize := bimg.NewImage(buf.Bytes())
+	imageType := imageToResize.Type()
+	if !IsImageTypeAllowed(imageType) {
+		return nil, ImageTypeNotAllowedError
+	}
+
+	resized, err := imageToResize.Process(bimg.Options{
+		Width:  width,
+		Height: height,
 	})
 	if err != nil {
 		return nil, err

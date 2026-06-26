@@ -8,17 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Route Groups
-func ImageRoutes(router *gin.RouterGroup) {
+// RegisterImageRoutes Route Groups
+func RegisterImageRoutes(router *gin.RouterGroup) {
 	imageGroup := router.Group("/image")
 	{
 		imageGroup.POST("/resize", resize)
 	}
 }
 
-// resize endpoint
+// resize: resizes an image given height and width
 func resize(c *gin.Context) {
-	file, _, err := c.Request.FormFile("file")
+	var req ResizeImageRequest
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	file, err := req.File.Open()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Could not open form file"})
 		return
@@ -31,11 +37,7 @@ func resize(c *gin.Context) {
 		return
 	}
 
-	result, err := ResizeImage(buf)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not resize the image"})
-		return
-	}
+	result, err := ResizeImage(buf, req.Width, req.Height)
 
 	contentType := http.DetectContentType(result)
 	c.Data(http.StatusOK, contentType, result)
