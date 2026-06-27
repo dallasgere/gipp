@@ -2,6 +2,7 @@ package image
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net/http"
 
@@ -38,6 +39,14 @@ func resize(c *gin.Context) {
 	}
 
 	result, err := ResizeImage(buf, req.Width, req.Height)
+	if err != nil {
+		if errors.Is(err, ErrImageTypeNotAllowed) {
+			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not resize image"})
+		return
+	}
 
 	contentType := http.DetectContentType(result)
 	c.Data(http.StatusOK, contentType, result)

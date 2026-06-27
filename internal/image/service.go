@@ -10,7 +10,7 @@ func ResizeImage(buf *bytes.Buffer, width int, height int) ([]byte, error) {
 	imageToResize := bimg.NewImage(buf.Bytes())
 	imageType := imageToResize.Type()
 	if !IsImageTypeAllowed(imageType) {
-		return nil, ImageTypeNotAllowedError
+		return nil, ErrImageTypeNotAllowed
 	}
 
 	resized, err := imageToResize.Process(bimg.Options{
