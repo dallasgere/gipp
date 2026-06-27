@@ -9,5 +9,3 @@ var allowedImageTypes = []string{"jpeg", "jpg", "png", "tiff", "gif"}
 func IsImageTypeAllowed(imageType string) bool {
 	return slices.Contains(allowedImageTypes, imageType)
 }
-
-// H
